@@ -1,0 +1,27 @@
+https://github.com/ldc-developers/ldc/pull/4662
+From 4b4da9f718f590301fb39f6c2acb109caa801acb Mon Sep 17 00:00:00 2001
+From: Andrei Horodniceanu <a.horodniceanu@proton.me>
+Date: Sun, 19 May 2024 02:06:22 +0300
+Subject: [PATCH] tests/codegen/casm.c: Move to casm.i
+
+Don't call the C preprocessor as it may fail in a cross-compilation
+environment. Drop the `-mtriple` argument and let the test run on all
+platforms.
+
+Signed-off-by: Andrei Horodniceanu <a.horodniceanu@proton.me>
+--- a/tests/codegen/casm.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-// REQUIRES: target_X86
+-// UNSUPPORTED: Windows
+-// RUN: %ldc -mtriple=x86_64-freebsd13 -output-ll -of=%t.ll %s && FileCheck %s < %t.ll
+-
+-// CHECK: module asm ".symver __qsort_r_compat, qsort_r@FBSD_1.0"
+-__asm__(".symver " "__qsort_r_compat" ", " "qsort_r" "@" "FBSD_1.0");
+--- /dev/null
++++ b/tests/codegen/casm.i
+@@ -0,0 +1,4 @@
++// RUN: %ldc -output-ll -of=%t.ll %s && FileCheck %s < %t.ll
++
++// CHECK: module asm ".symver __qsort_r_compat, qsort_r@FBSD_1.0"
++asm(".symver " "__qsort_r_compat" ", " "qsort_r" "@" "FBSD_1.0");
