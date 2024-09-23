@@ -1,0 +1,24 @@
+https://github.com/dlang/dmd/pull/16833 with paths adjusted for ldc2
+
+From dfe0f34b2aa59e6cf4526c9af8069e08638149bc Mon Sep 17 00:00:00 2001
+From: Andrei Horodniceanu <a.horodniceanu@proton.me>
+Date: Mon, 9 Sep 2024 14:23:29 +0300
+Subject: [PATCH] compiler/test/fail_compilation/needspkgmod.d: pass
+ -L--no-demangle
+
+The bfd linker since version 2.43 automatically demangles D
+symbols. It could do this before as well, though it was not automatic,
+it required the `--demangle=dlang` switch.
+
+Signed-off-by: Andrei Horodniceanu <a.horodniceanu@proton.me>
+--- a/tests/dmd/fail_compilation/needspkgmod.d
++++ b/tests/dmd/fail_compilation/needspkgmod.d
+@@ -3,7 +3,7 @@
+ // ARG_SETS: -i=,imports.pkgmod313
+ // ARG_SETS: -i=imports.pkgmod313,-imports.pkgmod313.mod
+ // ARG_SETS: -i=imports.pkgmod313.package,-imports.pkgmod313.mod
+-// REQUIRED_ARGS: -Icompilable
++// REQUIRED_ARGS: -Icompilable -L--no-demangle
+ // LINK:
+ /*
+ TEST_OUTPUT:

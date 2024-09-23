@@ -1,0 +1,10 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -188,6 +188,7 @@ if(NOT MSVC_IDE)
+         string(REPLACE " -release" "" DFLAGS_BUILD_TYPE "${DFLAGS_BUILD_TYPE}")
+     endif()
+ endif()
++set(DFLAGS_BUILD_TYPE "")
+ 
+ if(MSVC)
+     if(CMAKE_SIZEOF_VOID_P EQUAL 8)

@@ -1,0 +1,65 @@
+--- a/runtime/CMakeLists.txt
++++ b/runtime/CMakeLists.txt
+@@ -387,6 +387,7 @@ if(TARGET gen_gccbuiltins)
+       gen_gccbuiltins(${name})
+     endif()
+   endforeach()
++  add_custom_target(gccbuiltins ALL DEPENDS ${GCCBUILTINS})
+ endif()
+ 
+ # Always build zlib and other C parts of the runtime in release mode, regardless
+@@ -836,6 +837,7 @@ include(jit-rt/DefineBuildJitRT.cmake)
+ #
+ 
+ set(libs_to_install)
++if(BUILD_RUNTIME)
+ # build host versions
+ build_runtime_variants("" "${RT_CFLAGS}" "${LD_FLAGS}" "${LIB_SUFFIX}" libs_to_install)
+ if(MULTILIB)
+@@ -899,6 +901,7 @@ if(PHOBOS2_DIR)
+     install(DIRECTORY ${PHOBOS2_DIR}/std DESTINATION ${INCLUDE_INSTALL_DIR} FILES_MATCHING PATTERN "*.d")
+     install(DIRECTORY ${PHOBOS2_DIR}/etc DESTINATION ${INCLUDE_INSTALL_DIR} FILES_MATCHING PATTERN "*.d")
+ endif()
++endif()
+ install(FILES ${GCCBUILTINS} DESTINATION ${INCLUDE_INSTALL_DIR}/ldc)
+ 
+ 
+@@ -1073,11 +1076,13 @@ if(MULTILIB AND "${TARGET_SYSTEM}" MATCHES "APPLE")
+     set(TESTLIB_SUFFIX "${LIB_SUFFIX}${HOST_BITNESS}")
+ endif()
+ 
++if(BUILD_RUNTIME)
+ # Now generate all test runner targets.
+ build_test_runner_variants("${TESTLIB_SUFFIX}" "" "")
+ if(MULTILIB AND ${HOST_BITNESS} EQUAL 64)
+     build_test_runner_variants("${MULTILIB_SUFFIX}" "-m32" "-m32")
+ endif()
++endif()
+ 
+ # Let's add a meta build target for all test runners.
+ add_custom_target(all-test-runners DEPENDS ${_GLOBAL_TESTRUNNERS})
+@@ -1134,9 +1139,11 @@ function(add_runtime_tests_variants path_suffix)
+     endif()
+ endfunction()
+ 
++if(BUILD_RUNTIME)
+ add_runtime_tests_variants("${TESTLIB_SUFFIX}")
+ if(MULTILIB AND ${HOST_BITNESS} EQUAL 64)
+     add_runtime_tests_variants("${MULTILIB_SUFFIX}")
+ endif()
++endif()
+ 
+ include(DRuntimeIntegrationTests)
+--- a/runtime/DRuntimeIntegrationTests.cmake
++++ b/runtime/DRuntimeIntegrationTests.cmake
+@@ -5,6 +5,10 @@ if(NOT GNU_MAKE_BIN)
+     return()
+ endif()
+ 
++if(NOT BUILD_RUNTIME)
++    return()
++endif()
++
+ macro(get_subdirs result dir)
+     file(GLOB children RELATIVE ${dir} ${dir}/*)
+     set(subdir_list "")

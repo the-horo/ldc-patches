@@ -1,0 +1,17 @@
+ld.bfd fails to link executable inside druntime-test-shared because it
+fails to find the transitive dependencies of the libraries it
+links. It works if one uses -L to specify the directories with the
+transitive deps. This is specific to bfd, other linkers like lld work
+fine, and it seems to be a know issue.
+
+--- a/runtime/DRuntimeIntegrationTests.cmake
++++ b/runtime/DRuntimeIntegrationTests.cmake
+@@ -42,7 +42,7 @@ string(REPLACE ";" " " cflags_base "${RT_CFLAGS}")
+ if("${TARGET_SYSTEM}" MATCHES "MSVC")
+     set(cflags_base "${cflags_base} /Wall")
+ else()
+-    set(cflags_base "${cflags_base} -Wall -Wl,-rpath,${CMAKE_BINARY_DIR}/lib${LIB_SUFFIX}")
++    set(cflags_base "${cflags_base} -Wall -Wl,-rpath,${CMAKE_BINARY_DIR}/lib${LIB_SUFFIX} -L${CMAKE_BINARY_DIR}/lib${LIB_SUFFIX}")
+ endif()
+
+ set(linkdl "")
